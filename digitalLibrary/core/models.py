@@ -60,7 +60,7 @@ class Student(models.Model):
     name = models.CharField(null=False, max_length=255)
     age = models.IntegerField(null=False)
     email = models.EmailField(null=False, max_length=255, unique=True)
-    phone_number = models.CharField(max_length=12, null=False)
+    phone_number = models.CharField(max_length=15, null=False)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     created_on = models.DateField(auto_now_add=True)
     updated_on = models.DateField(auto_now=True)
