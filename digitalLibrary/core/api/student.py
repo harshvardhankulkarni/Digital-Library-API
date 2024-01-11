@@ -2,6 +2,7 @@ import os
 from datetime import date, timedelta
 
 from core.models import Student, Card
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from .serializer import StudentSerializer
 
 
+@csrf_exempt
 @api_view(['GET', 'POST'])
 def student_list(request):
     card_validity = int(os.getenv('CARD_VALIDITY'))
@@ -26,6 +28,7 @@ def student_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@csrf_exempt
 @api_view(['GET', 'PUT', 'DELETE'])
 def student_detail(request, pk):
     try:
