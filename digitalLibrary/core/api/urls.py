@@ -5,8 +5,10 @@ from ..api import views, student, author, transaction, book, report
 urlpatterns = [
     path('', views.get_routes),
 
-    path('students/', student.student_list),
-    path('students/<int:pk>', student.student_detail),
+    path('students/', student.StudentList.as_view()),
+    path('students/<int:pk>', student.StudentDetail.as_view()),
+    # path('students/', student.student_list),
+    # path('students/<int:pk>', student.student_detail),
 
     path('books/', book.book_list),
     path('books/<int:pk>', book.book_detail),
