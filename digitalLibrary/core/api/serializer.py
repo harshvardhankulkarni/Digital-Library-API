@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.validators import UniqueValidator
 
-from ..models import Student, Book, Author, Transaction, Card
+from ..models import Student, Book, Author, Transaction, Card, Country
 
 
 class StudentSerializer(ModelSerializer):
@@ -10,6 +10,7 @@ class StudentSerializer(ModelSerializer):
     age = serializers.IntegerField(required=True)
     email = serializers.EmailField(required=True, validators=[UniqueValidator(Student.objects.all())])
     phone_number = serializers.CharField(required=True, max_length=15)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
 
     class Meta:
         model = Student
@@ -20,6 +21,7 @@ class AuthorSerializer(ModelSerializer):
     name = serializers.CharField(required=True)
     age = serializers.IntegerField(required=True)
     email = serializers.EmailField(required=True)
+    country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
 
     class Meta:
         model = Author
