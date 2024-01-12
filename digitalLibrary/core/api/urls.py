@@ -10,11 +10,13 @@ urlpatterns = [
     # path('students/', student.student_list),
     # path('students/<int:pk>', student.student_detail),
 
+    path('authors/', author.AuthorList.as_view()),
+    path('authors/<int:pk>', author.AuthorDetail.as_view()),
+    # path('authors/', author.author_list),
+    # path('authors/<int:pk>', author.author_detail),
+
     path('books/', book.book_list),
     path('books/<int:pk>', book.book_detail),
-
-    path('authors/', author.author_list),
-    path('authors/<int:pk>', author.author_detail),
 
     path('transaction/issue_book/', transaction.issue_book),
     path('transaction/return_book/', transaction.return_book),
