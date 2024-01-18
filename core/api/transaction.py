@@ -1,11 +1,11 @@
 import os
-from datetime import date
+from datetime import date, timedelta
 
-from core.models import Book, Transaction, Card, Student
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from core.models import Book, Transaction, Student
 from .serializer import TransactionSerializer
 
 
@@ -13,35 +13,40 @@ from .serializer import TransactionSerializer
 def issue_book(request):
     if request.method == 'POST':
         book_id = request.data.get('book')
-        card_id = request.data.get('card')
+        student_id = request.data.get('student')
 
-        # Check if the card is active
+        # Check if the Student is Exist
         try:
-            card = Card.objects.get(id=card_id)
-            if not card.valid_up_to >= date.today():
-                card.status = False
-                card.save()
-                return Response({'error': 'Card not active'}, status=status.HTTP_400_BAD_REQUEST)
-            try:
-                card.student
-            except Student.DoesNotExist:
-                return Response({'error': 'Card has no student'}, status=status.HTTP_400_BAD_REQUEST)
-        except Card.DoesNotExist:
-            return Response({'error': 'Card not found'}, status=status.HTTP_400_BAD_REQUEST)
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Check if the book is available
+        # Check if the book is Exist
         try:
-            book = Book.objects.get(id=book_id, available=True)
+            book = Book.objects.get(id=book_id)
         except Book.DoesNotExist:
-            return Response({'error': 'Book not found or not available'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Book not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if Transaction.objects.filter(card=card, status=True).count() >= 3:
-            return Response({'error': 'Card has reached the maximum number of issued books'},
+        # Check if book is Available
+        if not book.available:
+            return Response({'error': 'Book not Available'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if Student don't issued 3 books
+        if student.issued_books >= 3:
+            return Response({'error': 'Student has reached the maximum number of issued books'},
                             status=status.HTTP_400_BAD_REQUEST)
 
+        today_date = date.today()
+        book_due_date = today_date - timedelta(days=int(os.getenv('BOOK_VALIDITY')))
+
         # Issue the book
-        transaction = Transaction.objects.create(card=card, book=book, is_issued=True, is_returned=False, status=True,
-                                                 book_due_date=card.valid_up_to)
+        transaction = Transaction.objects.create(
+            student=student, book=book, is_issued=True, is_returned=False, status=True,
+            book_due_date=book_due_date)
+
+        # Issued One Book Student
+        student.issued_books += 1
+        student.save()
 
         # Book is Now unavailable
         book.available = False
@@ -49,7 +54,7 @@ def issue_book(request):
 
         return Response({
             'message': 'Book Issued Successfully',
-            'due_date': card.valid_up_to.strftime('%Y-%m-%d')
+            'due_date': transaction.book_due_date.strftime('%Y-%m-%d')
         })
 
 
@@ -58,14 +63,14 @@ def return_book(request):
     fine = int(os.getenv('FINE'))
     if request.method == 'POST':
         book_id = request.data.get('book')
-        card_id = request.data.get('card')
+        student_id = request.data.get('student')
 
         fine_amount: int = 0
 
         try:
-            card = Card.objects.get(id=card_id)
-        except Card.DoesNotExist:
-            return Response({'error': 'Card not found'}, status=status.HTTP_400_BAD_REQUEST)
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             book = Book.objects.get(id=book_id)
@@ -74,27 +79,27 @@ def return_book(request):
 
         # Check if the transaction is available
         try:
-            transaction = Transaction.objects.get(book=book, card=card, status=True)
+            transaction = Transaction.objects.get(book=book, student=student, status=True)
         except Transaction.DoesNotExist:
             return Response({'error': 'Transaction not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if card.status:
-            # Book is Now available
-            book.available = True
-            book.save()
+        # Book is Now available
+        book.available = True
+        book.save()
+        today = date.today()
 
-            if date.today() > transaction.book_due_date:
-                fine_amount = (date.today() - transaction.book_due_date) * fine
+        if today > transaction.book_due_date:
+            fine_amount = (today - transaction.book_due_date) * fine
 
-                # Deactivate card
-                card.status = False
-                card.save()
+        # update student
+        student.issued_books -= 1
+        student.save()
 
-            # Update Transaction Details
-            transaction.fine_amount = fine_amount
-            transaction.is_returned = True
-            transaction.status = False
-            transaction.save()
+        # Update Transaction Details
+        transaction.fine_amount = fine_amount
+        transaction.is_returned = True
+        transaction.status = False
+        transaction.save()
 
         return Response({
             'message': 'Book Returned Successfully',
@@ -115,13 +120,13 @@ def transaction_details_book(request, pk):
 
 
 @api_view(['GET'])
-def transaction_details_card(request, pk):
+def transaction_details_student(request, pk):
     try:
-        card = Card.objects.get(id=pk)
-    except Card.DoesNotExist:
-        return Response({'error': 'Card not found'}, status=status.HTTP_400_BAD_REQUEST)
+        student = Student.objects.get(id=pk)
+    except Student.DoesNotExist:
+        return Response({'error': 'Student not found'}, status=status.HTTP_400_BAD_REQUEST)
 
-    transactions = Transaction.objects.filter(card=card)
+    transactions = Transaction.objects.filter(student=student)
     serializer = TransactionSerializer(transactions, many=True)
     return Response(serializer.data)
 

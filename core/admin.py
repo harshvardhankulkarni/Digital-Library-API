@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Author, Student, Book, Country, Language, Card, Genra, Transaction
+from .models import Author, Student, Book, Country, Language, Genra, Transaction
 
 
 class AuthorAdmin(admin.ModelAdmin):
@@ -11,7 +11,7 @@ admin.site.register(Author, AuthorAdmin)
 
 
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'age', 'email', 'phone_number', 'country', 'created_on', 'updated_on', 'card']
+    list_display = ['name', 'age', 'email', 'phone_number', 'country', 'created_on', 'updated_on', 'issued_books']
 
 
 admin.site.register(Student, StudentAdmin)
@@ -40,14 +40,6 @@ class CountryAdmin(admin.ModelAdmin):
 admin.site.register(Country, CountryAdmin)
 
 
-class CardAdmin(admin.ModelAdmin):
-    list_display = ['id', 'valid_up_to', 'student']
-    ordering = ['id']
-
-
-admin.site.register(Card, CardAdmin)
-
-
 class GenraAdmin(admin.ModelAdmin):
     list_display = ['genra']
     ordering = ['genra']
@@ -57,7 +49,7 @@ admin.site.register(Genra, GenraAdmin)
 
 
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ['card', 'book', 'transaction_date', 'book_due_date', 'is_issued', 'is_returned', 'fine_amount',
+    list_display = ['student', 'book', 'transaction_date', 'book_due_date', 'is_issued', 'is_returned', 'fine_amount',
                     'status']
     ordering = ['transaction_date']
 

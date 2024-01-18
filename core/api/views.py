@@ -32,15 +32,14 @@ def get_routes(request):
         'POST /api/transaction/return_book/',
         'GET /api/transaction/<int:id>',
         'GET /api/transaction/books/<int:id>',
-        'GET /api/transaction/cards/<int:id>',
+        'GET /api/transaction/students/<int:id>',
         # Report
         'GET /api/report/books-issued/?from=<Date:date>&to=<Date:date>',
         'GET /api/report/books-returned/?from=<Date:date>&to=<Date:date>',
         'GET /api/report/total-fine/?from=<Date:date>&to=<Date:date>',
         'GET /api/report/total-signed-up-students/?date=<Date:date>',
-        'GET /api/report/inactivate-card-students/',
         'GET /api/report/due-books/',
-        'GET /api/report/card-with-three-book-issued/',
+        'GET /api/report/student-with-three-book-issued/',
     ]
     return Response(routes)
 

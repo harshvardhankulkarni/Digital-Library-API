@@ -1,13 +1,13 @@
 from datetime import date
 
-from core.models import Transaction, Student, Card
-from django.db.models import Sum, Count
+from django.db.models import Sum
 from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .serializer import BookSerializer, StudentSerializer, CardSerializer
+from core.models import Transaction, Student
+from .serializer import BookSerializer, StudentSerializer
 
 
 @api_view(['GET'])
@@ -120,23 +120,11 @@ def total_student_signed_up(request):
 
 
 @api_view(['GET'])
-def inactivate_card_students(request):
-    students = Student.objects.filter(card=None)
-    serializer = StudentSerializer(students, many=True)
-    return Response(serializer.data)
+def student_with_three_book_issued(request):
+    transactions = Transaction.objects.filter(status=True, is_issued=True).values_list('student', flat=True)
 
+    students = Student.objects.filter(id__in=transactions)
+    students_with_three_book_issued = students.filter(issued_books=3)
 
-@api_view(['GET'])
-def card_with_three_book_issued(request):
-    transactions = Transaction.objects.filter(
-        status=True, is_issued=True
-    ).values('card').annotate(num_issued_books=Count('id')).filter(num_issued_books=3)
-
-    card_ids_with_three_issued_books = transactions.values_list('card', flat=True)
-    cards_with_three_issued_books = Card.objects.filter(id__in=card_ids_with_three_issued_books)
-
-    for card in cards_with_three_issued_books:
-        print(f'Card ID: {card.id}, Student Name: {card.student.name}')
-
-    serializer = CardSerializer(cards_with_three_issued_books, many=True)
+    serializer = StudentSerializer(students_with_three_book_issued, many=True)
     return Response(serializer.data)

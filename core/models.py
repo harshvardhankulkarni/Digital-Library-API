@@ -46,16 +46,6 @@ class Book(models.Model):
         return f'{self.name}'
 
 
-class Card(models.Model):
-    status = models.BooleanField(null=False, default=True)
-    valid_up_to = models.DateField()
-    created_on = models.DateField(auto_now_add=True)
-    updated_on = models.DateField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.id}'
-
-
 class Student(models.Model):
     name = models.CharField(null=False, max_length=255)
     age = models.IntegerField(null=False)
@@ -64,14 +54,14 @@ class Student(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     created_on = models.DateField(auto_now_add=True)
     updated_on = models.DateField(auto_now=True)
-    card = models.OneToOneField(Card, on_delete=models.SET_NULL, null=True, blank=True)
+    issued_books = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.name}'
 
 
 class Transaction(models.Model):
-    card = models.ForeignKey(Card, on_delete=models.SET_NULL, null=True, blank=True)
+    student = models.ForeignKey(Student, on_delete=models.SET_NULL, null=True, blank=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     transaction_date = models.DateField(auto_now_add=True)
     book_due_date = models.DateField()
