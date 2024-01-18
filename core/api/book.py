@@ -1,9 +1,10 @@
-from core.models import Book
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from core.models import Book, Author
 from .serializer import BookSerializer
+from .validators import validate_email
 
 
 @api_view(['GET', 'POST'])
@@ -14,6 +15,21 @@ def book_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
+        author_email = request.data.get('author_email')
+        author_name = request.data.get('author_name')
+
+        if not author_email:
+            return Response({'author_email': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not author_name:
+            return Response({'author_name': 'This field is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if validate_email(author_email):
+            return Response({'error': 'Author email is not valid.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        author, created = Author.objects.get_or_create(email=author_email, name=author_name)
+
+        request.data['author'] = author.id
         serializer = BookSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

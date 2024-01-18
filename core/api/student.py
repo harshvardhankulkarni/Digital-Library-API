@@ -1,10 +1,10 @@
 # import os
 # from datetime import date, timedelta
 
-from core.models import Student
 # from django.views.decorators.csrf import csrf_exempt
 from rest_framework import generics
 
+from core.models import Student
 from .serializer import StudentSerializer
 
 

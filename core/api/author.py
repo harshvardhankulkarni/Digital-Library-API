@@ -1,10 +1,10 @@
-from core.models import Author
 from django.http import Http404
 from rest_framework import status
 from rest_framework.decorators import APIView
-# from rest_framework.decorators import api_view, APIView
+# from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from core.models import Author
 from .serializer import AuthorSerializer
 
 

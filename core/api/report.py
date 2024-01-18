@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from core.models import Transaction, Student
+from core.models import Transaction, Student, Book
 from .serializer import BookSerializer, StudentSerializer
 
 
@@ -30,9 +30,9 @@ def issued_books(request):
 
     transactions = Transaction.objects.filter(
         transaction_date__range=(from_date, to_date), is_issued=True
-    ).select_related('book')
+    ).values_list('book', flat=True)
 
-    books = set(transaction.book for transaction in transactions)
+    books = Book.objects.filter(id__in=transactions)
     serializer = BookSerializer(books, many=True)
     return Response(serializer.data)
 
@@ -57,9 +57,9 @@ def returned_books(request):
 
     transactions = Transaction.objects.filter(
         transaction_date__range=(from_date, to_date), is_returned=True
-    ).select_related('book')
+    ).values_list('book', flat=True)
 
-    books = set(transaction.book for transaction in transactions)
+    books = Book.objects.filter(id__in=transactions)
     serializer = BookSerializer(books, many=True)
     return Response(serializer.data)
 
@@ -68,9 +68,9 @@ def returned_books(request):
 def due_books_today(request):
     transactions = Transaction.objects.filter(
         book_due_date__lte=date.today(), is_returned=False
-    ).select_related('book')
+    ).values_list('book', flat=True)
 
-    books = set(transaction.book for transaction in transactions)
+    books = Book.objects.filter(id__in=transactions)
     serializer = BookSerializer(books, many=True)
     return Response(serializer.data)
 

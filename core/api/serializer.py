@@ -11,7 +11,7 @@ class StudentSerializer(ModelSerializer):
     email = serializers.EmailField(required=True, validators=[UniqueValidator(Student.objects.all())])
     phone_number = serializers.CharField(required=True, max_length=15)
     country = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all())
-    issued_books = serializers.IntegerField(read_only=True)
+    issued_books = serializers.ReadOnlyField()
 
     class Meta:
         model = Student
@@ -42,9 +42,12 @@ class AuthorSerializer(ModelSerializer):
 
 
 class BookSerializer(ModelSerializer):
+    author_name = serializers.CharField(source='author.name', read_only=True)
+    author = serializers.PrimaryKeyRelatedField(write_only=True, queryset=Author.objects.all())
+
     class Meta:
         model = Book
-        fields = ['name', 'author', 'number_of_pages', 'language', 'available', 'genra', 'ISBN_number',
+        fields = ['name', 'author_name', 'author', 'number_of_pages', 'language', 'available', 'genra', 'ISBN_number',
                   'published_date']
 
 

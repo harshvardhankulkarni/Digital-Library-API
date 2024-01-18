@@ -1,8 +1,9 @@
-from core.data import scrape_genra, scrape_languages, scrape_countries
-from core.models import Country, Language, Genra
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from core.data import scrape_genra, scrape_languages, scrape_countries
+from core.models import Country, Language, Genra
 
 
 @api_view(["GET"])

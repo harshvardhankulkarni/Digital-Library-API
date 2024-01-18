@@ -25,8 +25,8 @@ class Genra(models.Model):
 class Author(models.Model):
     name = models.CharField(null=False, max_length=255)
     email = models.EmailField(null=False, max_length=255, unique=True)
-    age = models.IntegerField(null=False)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    age = models.IntegerField(null=True, blank=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f'{self.name}'
@@ -73,4 +73,4 @@ class Transaction(models.Model):
     updated_on = models.DateField(auto_now=True)
 
     def __str__(self):
-        return f'{self.id}'
+        return f'{self.student}" - "{self.book}'
