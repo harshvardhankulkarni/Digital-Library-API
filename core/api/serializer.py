@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 from rest_framework.validators import UniqueValidator
 
-from ..models import Student, Book, Author, Transaction, Card, Country
+from core.models import Student, Book, Author, Transaction, Card, Country
 
 
 class StudentSerializer(ModelSerializer):
