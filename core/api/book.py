@@ -27,7 +27,11 @@ def book_list(request):
         if validate_email(author_email):
             return Response({'error': 'Author email is not valid.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        author, created = Author.objects.get_or_create(email=author_email, name=author_name)
+        author, created = Author.objects.get_or_create(email=author_email)
+
+        if created:
+            author.name = author_name
+            author.save()
 
         request.data['author'] = author.id
         serializer = BookSerializer(data=request.data)

@@ -3,27 +3,6 @@ from django.contrib import admin
 from .models import Author, Student, Book, Country, Language, Genra, Transaction
 
 
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ['name', 'email', 'age', 'country']
-
-
-admin.site.register(Author, AuthorAdmin)
-
-
-class StudentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'age', 'email', 'phone_number', 'country', 'created_on', 'updated_on', 'issued_books']
-
-
-admin.site.register(Student, StudentAdmin)
-
-
-class BookAdmin(admin.ModelAdmin):
-    list_display = ['name', 'author', 'number_of_pages', 'language', 'available', 'published_date']
-
-
-admin.site.register(Book, BookAdmin)
-
-
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ['language']
     ordering = ['language']
@@ -46,6 +25,27 @@ class GenraAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Genra, GenraAdmin)
+
+
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'age', 'country']
+
+
+admin.site.register(Author, AuthorAdmin)
+
+
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ['name', 'age', 'email', 'phone_number', 'country', 'created_on', 'updated_on', 'issued_books']
+
+
+admin.site.register(Student, StudentAdmin)
+
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ['name', 'author', 'number_of_pages', 'language', 'available', 'published_date']
+
+
+admin.site.register(Book, BookAdmin)
 
 
 class TransactionAdmin(admin.ModelAdmin):
